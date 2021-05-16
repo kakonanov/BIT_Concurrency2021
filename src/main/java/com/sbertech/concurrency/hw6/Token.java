@@ -2,31 +2,31 @@ package com.sbertech.concurrency.hw6;
 
 public class Token {
 	private final int id;
-	private final int srcNumber;
-	private final int dstNumber;
-	private long creationTime;
+	private long time = 0;
 
-
-
-	public Token(int id, int srcNumber, int dstNumber) {
+	public Token(int id) {
 		this.id = id;
-		this.srcNumber = srcNumber;
-		this.dstNumber = dstNumber;
 	}
 
 	public int getId() {
 		return id;
 	}
 
-	public int getDstNumber() {
-		return dstNumber;
+	public void setTime(long time) {
+		this.time = time;
 	}
 
-	public int getSrcNumber() {
-		return srcNumber;
+	public long getTime() {
+		return time;
 	}
 
-	public void setCreationTime(int creationTime) {
-		this.creationTime = creationTime;
+	@Override
+	public String toString() {
+		return "Token{" +
+				"id=" + id +
+				", time=" + time +
+				'}';
 	}
+
+
 }

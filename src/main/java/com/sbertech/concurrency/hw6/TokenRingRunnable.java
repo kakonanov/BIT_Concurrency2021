@@ -19,7 +19,8 @@ public class TokenRingRunnable implements Runnable {
 			try {
 				node.handleToken(nodeConnector.take());
 			} catch (InterruptedException e) {
-				System.out.println("Thread " + Integer.parseInt(Thread.currentThread().getName()) + " is interrupted!!!");
+//				System.out.println("Thread " + Integer.parseInt(Thread.currentThread().getName()) + " is interrupted!!!");
+				return;
 			}
 		}
 	}

@@ -16,13 +16,7 @@ public class NodeImpl implements Node {
 
 	@Override
 	public void handleToken(Token token) throws InterruptedException {
-		if (token.getDstNumber() == getOrderNumber()) {
-			System.out.println("Handling token " + token.getId() + " in node " + getOrderNumber());
-			consumer.accept(token);
-		}
-		else if (token.getSrcNumber() == getOrderNumber()) {
-
-		}
+		consumer.accept(token);
 		nodeConnector.put(token);
 	}
 }
