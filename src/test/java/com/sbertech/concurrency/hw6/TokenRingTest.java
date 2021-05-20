@@ -16,8 +16,8 @@ class TokenRingTest {
 	private static final long periodTime = 500; // milliseconds
 	private static final int throughputArraySize = (int) ((millisForWork - 3_000) / periodTime);
 
-	private static final Path latencyPath = Paths.get("src/test/resources/latencyEqPockets.csv");
-	private static final Path throughputPath = Paths.get("src/test/resources/throughputEqPockets.csv");
+	private static final Path latencyPath = Paths.get("src/test/resources/latencyDepPockets.csv");
+	private static final Path throughputPath = Paths.get("src/test/resources/throughputDepPockets.csv");
 
 	private static final CSVWriter latencyWriter = new CSVWriter(latencyPath);
 	private static final CSVWriter throughputWriter = new CSVWriter(throughputPath);
@@ -39,38 +39,48 @@ class TokenRingTest {
 
 
 //	@ParameterizedTest
-//	@ValueSource(ints = {2, 3, 4, 5, 6})
+//	@ValueSource(ints = {2, 3, 4, 5, 6, 7})
 //	public void testNumNodes(int size) throws InterruptedException {
-//		double load = 0.5;
+//		double load = 0.2;
 //		int queueSize = size;
 //		testTokenRing(load, size, queueSize, (int) Math.ceil(size * queueSize * load));
 //	}
 
-	@ParameterizedTest
-	@ValueSource(ints = {2, 3, 4})
-	public void testLowLoad(int size) throws InterruptedException {
-		double load = 0.5;
-		for (int queueSize = 2; queueSize <= size + 3; ++queueSize) {
-			testTokenRing(load, size, queueSize, (int) Math.ceil(size * load));
-		}
-	}
+//	@ParameterizedTest
+//	@ValueSource(ints = {2, 3, 4})
+//	public void testLowLoad(int size) throws InterruptedException {
+//		double load = 0.5;
+//		for (int queueSize = 2; queueSize <= size + 5; ++queueSize) {
+//			testTokenRing(load, size, queueSize, (int) Math.ceil(size * load));
+//		}
+//	}
+//
+//	@ParameterizedTest
+//	@ValueSource(ints = {2, 3, 4})
+//	public void testMediumLoad(int size) throws InterruptedException {
+//		double load = 1;
+//		for (int queueSize = 2; queueSize <= size + 5; ++queueSize) {
+//			testTokenRing(load, size, queueSize, (int) Math.ceil(size * load));
+//		}
+//	}
+//
+//	@ParameterizedTest
+//	@ValueSource(ints = {2, 3, 4})
+//	public void testHighLoad(int size) throws InterruptedException {
+//		double load = 0.8;
+//		for (int queueSize = 2; queueSize <= size + 5; ++queueSize) {
+//			testTokenRing(load, size, queueSize, (int) Math.ceil(size * 2 * load));
+//		}
+//	}
+
 
 	@ParameterizedTest
-	@ValueSource(ints = {2, 3, 4})
-	public void testMediumLoad(int size) throws InterruptedException {
-		double load = 1;
-		for (int queueSize = 2; queueSize <= size + 3; ++queueSize) {
-			testTokenRing(load, size, queueSize, (int) Math.ceil(size * load));
-		}
-	}
-
-	@ParameterizedTest
-	@ValueSource(ints = {2, 3, 4})
-	public void testHighLoad(int size) throws InterruptedException {
+	@ValueSource(ints = {4, 8, 12, 20, 28})
+	public void testHighLoad(int queueSize) throws InterruptedException {
 		double load = 0.8;
-		for (int queueSize = 2; queueSize <= size + 3; ++queueSize) {
-			testTokenRing(load, size, queueSize, (int) Math.ceil(size * 2 * load));
-		}
+		int size = 4;
+		for (int pocketNum = 3; pocketNum < size * queueSize; pocketNum += 4)
+			testTokenRing(load, size, queueSize, pocketNum);
 	}
 
 	public void testTokenRing(double load, int size, int queueSize, int pocketNum) throws InterruptedException {
