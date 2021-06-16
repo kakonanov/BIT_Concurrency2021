@@ -93,8 +93,8 @@ class TokenRingTest {
 		Thread.sleep(millisForWork);
 		tokenRing.stop();
 
-		latencyWriter.write(load, size, queueSize, pocketNum, tokenRing.getLatencies());
-		throughputWriter.write(load, size, queueSize, pocketNum, tokenRing.getThroughputs());
+		latencyWriter.write(load, size, queueSize, pocketNum, tokenRing.getLatenciesArrays());
+		throughputWriter.write(load, size, queueSize, pocketNum, tokenRing.getThroughputsArrays());
 	}
 
 }

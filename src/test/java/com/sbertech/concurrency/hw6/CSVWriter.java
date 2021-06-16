@@ -24,9 +24,10 @@ public class CSVWriter {
         }
     }
 
-    public void write(double load, int size, int queueSize, int pocketNum, long[] array) {
+    public void write(double load, int size, int queueSize, int pocketNum, long[][] array) {
         String param = load + "," + size + "," + queueSize + "," + pocketNum;
         Arrays.stream(array)
+                .flatMapToLong(Arrays::stream)
                 .forEach(l -> {
                     try {
                         Files.write(path, Collections.singleton(param + "," + l), StandardCharsets.UTF_8, StandardOpenOption.APPEND);
@@ -34,6 +35,7 @@ public class CSVWriter {
                         e.printStackTrace();
                     }
                 });
+
     }
 
 }
