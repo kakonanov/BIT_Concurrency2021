@@ -38,7 +38,7 @@ public class TokenRing {
 				.range(0, size)
 				.mapToObj(i -> new CountConsumer(
 						new CountThroughputConsumer(throughputsArrays[i], throughputArraySize, periodTime),
-						new CountLatencyConsumer(latenciesArrays[i], latencyArraySize),
+						new CountLatencyConsumer(latenciesArrays[i], latencyArraySize, i, size),
 						consumer
 				))
 				.collect(Collectors.toList());

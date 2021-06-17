@@ -13,11 +13,11 @@ import java.util.List;
 class TokenRingTest {
 	private static final int latencyArraySize = 100;
 	private static final long millisForWork = 10_000; //milliseconds
-	private static final long periodTime = 500; // milliseconds
+	private static final long periodTime = 1000; // milliseconds
 	private static final int throughputArraySize = (int) ((millisForWork - 3_000) / periodTime);
 
-	private static final Path latencyPath = Paths.get("src/test/resources/latencyDepPockets.csv");
-	private static final Path throughputPath = Paths.get("src/test/resources/throughputDepPockets.csv");
+	private static final Path latencyPath = Paths.get("src/test/resources/latency2.csv");
+	private static final Path throughputPath = Paths.get("src/test/resources/throughput2.csv");
 
 	private static final CSVWriter latencyWriter = new CSVWriter(latencyPath);
 	private static final CSVWriter throughputWriter = new CSVWriter(throughputPath);
@@ -38,13 +38,13 @@ class TokenRingTest {
 	}
 
 
-//	@ParameterizedTest
-//	@ValueSource(ints = {2, 3, 4, 5, 6, 7})
-//	public void testNumNodes(int size) throws InterruptedException {
-//		double load = 0.2;
-//		int queueSize = size;
-//		testTokenRing(load, size, queueSize, (int) Math.ceil(size * queueSize * load));
-//	}
+	@ParameterizedTest
+	@ValueSource(ints = {2, 3, 4, 5, 6, 7})
+	public void testNumNodes(int size) throws InterruptedException {
+		double load = 0.5;
+		int queueSize = size;
+		testTokenRing(load, size, queueSize, (int) Math.ceil(size * queueSize * load));
+	}
 
 //	@ParameterizedTest
 //	@ValueSource(ints = {2, 3, 4})
@@ -74,14 +74,14 @@ class TokenRingTest {
 //	}
 
 
-	@ParameterizedTest
-	@ValueSource(ints = {4, 8, 12, 20, 28})
-	public void testHighLoad(int queueSize) throws InterruptedException {
-		double load = 0.8;
-		int size = 4;
-		for (int pocketNum = 3; pocketNum < size * queueSize; pocketNum += 4)
-			testTokenRing(load, size, queueSize, pocketNum);
-	}
+//	@ParameterizedTest
+//	@ValueSource(ints = {4, 8, 12, 20, 28})
+//	public void testHighLoad(int queueSize) throws InterruptedException {
+//		double load = 0.8;
+//		int size = 4;
+//		for (int pocketNum = 3; pocketNum < size * queueSize; pocketNum += 4)
+//			testTokenRing(load, size, queueSize, pocketNum);
+//	}
 
 	public void testTokenRing(double load, int size, int queueSize, int pocketNum) throws InterruptedException {
 		TokenRing tokenRing = TokenRing.create(size, queueSize, latencyArraySize, throughputArraySize, periodTime);
