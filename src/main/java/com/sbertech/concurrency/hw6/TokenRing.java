@@ -15,30 +15,33 @@ public class TokenRing {
 	private final List<Node> nodes;
 	private final List<Thread> threads;
 	private final int size;
-	private final long [] latencies;
-	private final long[] throughputs;
+	private final long[][] latenciesArrays;
+	private final long[][] throughputsArrays;
 
 
-	public TokenRing(int size, List<NodeConnector> nodeConnectors, List<Node> nodes, List<Thread> threads, long[] latencies, long[] throughputs) {
+	public TokenRing(int size, List<NodeConnector> nodeConnectors, List<Node> nodes, List<Thread> threads, long[][] latenciesArrays, long[][] throughputsArrays) {
 		this.nodeConnectors = nodeConnectors;
 		this.nodes = nodes;
 		this.threads = threads;
 		this.size = size;
-		this.latencies = latencies;
-		this.throughputs = throughputs;
+		this.latenciesArrays = latenciesArrays;
+		this.throughputsArrays = throughputsArrays;
 	}
 
 	public static TokenRing create(int size, int queueSize, int latencyArraySize, int throughputArraySize, long periodTime) {
-		long[] latencies = new long[latencyArraySize];
-		long[] throughputs = new long[throughputArraySize];
+		long[][] latenciesArrays = new long[size][latencyArraySize];
+		long[][] throughputsArrays = new long[size][throughputArraySize];
 
-		CountLatencyConsumer countLatencyConsumer = new CountLatencyConsumer(latencies, latencyArraySize);
-		CountThroughputConsumer countThroughputConsumer = new CountThroughputConsumer(throughputs, throughputArraySize, periodTime);
-		Consumer<Token> countConsumer = token -> {
-			countLatencyConsumer.accept(token);
-			countThroughputConsumer.accept(token);
-		};
-		Consumer<Token> skipConsumer = token -> token = token;
+		Consumer<Token> consumer = token -> token = token;
+
+		List<CountConsumer> countConsumers = IntStream
+				.range(0, size)
+				.mapToObj(i -> new CountConsumer(
+						new CountThroughputConsumer(throughputsArrays[i], throughputArraySize, periodTime),
+						new CountLatencyConsumer(latenciesArrays[i], latencyArraySize, i, size),
+						consumer
+				))
+				.collect(Collectors.toList());
 
 		// Для 1ой node, nodeConnector - это 1ый nodeConnector из листа
 		List<NodeConnector> nodeConnectors = IntStream
@@ -46,12 +49,10 @@ public class TokenRing {
 				.mapToObj(i -> new BlockingQueueNodeConnector(queueSize))
 				.collect(Collectors.toList());
 
-		List<Node> nodes = nodeConnectors
-				.stream()
-				.map(nodeConnector -> new NodeImpl(nodeConnector, skipConsumer))
+		List<Node> nodes = IntStream
+				.range(0, size)
+				.mapToObj(i -> new NodeImpl(nodeConnectors.get(i), countConsumers.get(i)))
 				.collect(Collectors.toList());
-
-		nodes.set(0, new NodeImpl(nodeConnectors.get(0), countConsumer));
 
 		List<Thread> threads = IntStream
 				.range(0, size)
@@ -60,8 +61,7 @@ public class TokenRing {
 						String.valueOf(i)
 				))
 				.collect(Collectors.toList());
-
-		return new TokenRing(size, nodeConnectors, nodes, threads, latencies, throughputs);
+		return new TokenRing(size, nodeConnectors, nodes, threads, latenciesArrays, throughputsArrays);
 	}
 
 	void start() {
@@ -84,11 +84,11 @@ public class TokenRing {
 		return nodeConnectors;
 	}
 
-	public long[] getLatencies() {
-		return latencies;
+	public long[][] getLatenciesArrays() {
+		return latenciesArrays;
 	}
 
-	public long[] getThroughputs() {
-		return throughputs;
+	public long[][] getThroughputsArrays() {
+		return throughputsArrays;
 	}
 }
